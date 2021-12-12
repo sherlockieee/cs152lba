@@ -4,7 +4,7 @@ An expert system.
 
 First, make sure you have SWI-Prolog.
 
-If you are using MacOS, you can follow this instruction (taken from (https://www.swi-prolog.org/build/macos.html)[https://www.swi-prolog.org/build/macos.html].)
+If you are using MacOS, you can follow this instruction (taken from [https://www.swi-prolog.org/build/macos.html](https://www.swi-prolog.org/build/macos.html).)
 ```
 brew install swi-prolog
 brew install python-tk@3.9
