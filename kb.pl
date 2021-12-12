@@ -10,22 +10,22 @@ answer('You need to contact CIGNA and Barbara Walder') :- intention('I am experi
 answer('You need to contact your provider and Barbara Walder') :- intention('I am experiencing COVID symptom(s), I want to know next steps'), \+reside(city), \+insured('CIGNA').
 
 
-answer('Visit A&O Test Centre') :- intention('I am experiencing COVID symptom(s), I want to know next steps'), reside(city), res_hall('A&O').
-answer('Visit a nearby Test Centre') :- intention('I am experiencing COVID symptom(s), I want to know next steps'), reside(city), res_hall('Independent Housing').
+answer('Get a PCR test at Ostbahnhof Test Center') :- intention('I am experiencing COVID symptom(s), I want to know next steps'), reside(city).
+answer('Get a PCR test at a nearby test center') :- intention('I am experiencing COVID symptom(s), I want to know next steps'), reside(city).
 
 
 
 %rules when you are to travel
 
-answer('Visit A&O Test Centre') :-
-    intention('I want to travel'), result(urgent), res_hall('A&O').
-answer('Visit a nearby Test Center') :-
-    intention('I want to travel'), result(urgent), res_hall('Independent Housing').
-answer('Test privately') :-
+answer('Get free antigen test at A&O Test Centre') :-
+    intention('I want to travel'), result(urgent), reside(city), res_hall('A&O').
+answer('Get free antigen test at nearby Test Center') :-
+    intention('I want to travel'), result(urgent), reside(city), res_hall('Independent Housing').
+answer('Order a test kit on Amazon') :-
     intention('I want to travel'), \+result(urgent), testing('At home').
-answer('Visit A&O Test Centre') :-
+answer('Get a PCR test at Ostbahnhof Test Center') :-
     intention('I want to travel'), \+result(urgent), testing('At testing center'), reside(city), res_hall('A&O').
-answer('Visit a nearby Test Centre') :-
+answer('Get a PCR test at a nearby test center') :-
     intention('I want to travel'), \+result(urgent), testing('At testing center'), reside(city), res_hall('Independent Housing').
 answer('Visit your local city website') :-
     intention('I want to travel'), \+reside(city).
@@ -35,30 +35,32 @@ answer('Visit your local city website') :-
 %rules when you interract with infected person
 
 answer('You should isolate immediately'):-
-    intention('I came in close contact with a COVID patient'), exposure(known), \+quarantine_status(quarantine).
-answer('You should continue isolation till next testing date'):-
-    intention('I came in close contact with a COVID patient'), exposure(known), quarantine_status(quarantine).
+    intention('I came in close contact with a COVID patient'), exposure(positive), \+quarantine_status(quarantine).
+answer('You should continue isolation until the next testing date'):-
+    intention('I came in close contact with a COVID patient'), exposure(positive), quarantine_status(quarantine).
 
-answer('Visit A&O Test Centre'):-
-    intention('I came in close contact with a COVID patient'), \+exposure(known), \+symptoms(felt).
+answer('Get free antigen test at A&O Test Centre'):-
+    intention('I came in close contact with a COVID patient'), \+exposure(positive), \+symptoms(felt), reside(city), res_hall('A&O').
+answer('Get free antigen test at nearby Test Centre'):-
+    intention('I came in close contact with a COVID patient'), \+exposure(positive), \+symptoms(felt), reside(city), res_hall('Independent Housing').
 answer('You need to contact your provider and Barbara Walder'):-
-    intention('I came in close contact with a COVID patient'), \+exposure(known), symptoms(felt),  \+reside(city), \+insured('CIGNA').
+    intention('I came in close contact with a COVID patient'), \+exposure(positive),  \+reside(city), \+insured('CIGNA').
 answer('You need to contact CIGNA and Barbara Walder'):-
-    intention('I came in close contact with a COVID patient'), \+exposure(known), symptoms(felt), \+reside(city), insured('CIGNA').
-answer('Visit A&O Test Centre'):-
-    intention('I came in close contact with a COVID patient'), \+exposure(known), symptoms(felt), reside(city), res_hall('A&O').
-answer('Visit a nearby Test Centre'):-
-    intention('I came in close contact with a COVID patient'), \+exposure(known), symptoms(felt), reside(city), res_hall('Independent Housing').
+    intention('I came in close contact with a COVID patient'), \+exposure(positive), \+reside(city), insured('CIGNA').
+answer('Get a PCR test at Ostbahnhof Test Center'):-
+    intention('I came in close contact with a COVID patient'), \+exposure(positive), symptoms(felt), reside(city), res_hall('A&O').
+answer('Get a PCR test at a nearby test center'):-
+    intention('I came in close contact with a COVID patient'), \+exposure(positive), symptoms(felt), reside(city), res_hall('Independent Housing').
 
 
 % rules for a non-urgent check
 
-answer('Visit A&O Test Centre') :-
-    intention('It\'s not urgent, I just want to make sure I\'m safe.'), testing('At testing center'), res_hall('A&O').
-answer('Visit A&O Test Centre') :-
-    intention('It\'s not urgent, I just want to make sure I\'m safe.'), testing('At testing center'), res_hall('A&O').
-answer('Visit a nearby Test Centre') :-
-    intention('It\'s not urgent, I just want to make sure I\'m safe.'), testing('At testing center'), res_hall('Independent Housing').
+answer('Get free antigen test at A&O Test Centre') :-
+    intention('It\'s not urgent, I just want to make sure I\'m safe.'), testing('At testing center'), reside(city), res_hall('A&O').
+answer('Get free antigen test at nearby Test Centre') :-
+    intention('It\'s not urgent, I just want to make sure I\'m safe.'), testing('At testing center'), reside(city), res_hall('Independent Housing').
+answer('Visit your local city website') :-
+    intention('It\'s not urgent, I just want to make sure I\'m safe.'), testing('At testing center'), \+reside(city).
 answer('Order a test kit on Amazon') :-
     intention('It\'s not urgent, I just want to make sure I\'m safe.'), testing('At home').
 
@@ -76,7 +78,7 @@ reside(X) :-
     ask('Are you currently in the', X).
 
 exposure(X) :-
-    ask('Is your source of exposure', X).
+    ask('Is your recent test result', X).
 
 result(X) :- ask('Is your need for testing', X).
 
