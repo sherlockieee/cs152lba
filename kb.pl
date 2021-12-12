@@ -10,23 +10,23 @@ answer('You need to contact CIGNA and Barbara Walder') :- intention('I am experi
 answer('You need to contact your provider and Barbara Walder') :- intention('I am experiencing COVID symptom(s), I want to know next steps'), \+reside(city), \+insured('CIGNA').
 
 
-answer('Get a PCR test at Ostbahnhof Test Center') :- intention('I am experiencing COVID symptom(s), I want to know next steps'), reside(city).
-answer('Get a PCR test at a nearby test center') :- intention('I am experiencing COVID symptom(s), I want to know next steps'), reside(city).
+answer('Get a PCR test at Ostbahnhof Test Center') :- intention('I am experiencing COVID symptom(s), I want to know next steps'), reside(city), res_hall('A&O').
+answer('Get a PCR test at a nearby test center') :- intention('I am experiencing COVID symptom(s), I want to know next steps'), reside(city), res_hall('Independent Housing').
 
 
 
 %rules when you are to travel
 
 answer('Get free antigen test at A&O Test Centre') :-
-    intention('I want to travel'), result(urgent), reside(city), res_hall('A&O').
+    intention('I want to travel'), urgency(urgent), reside(city), res_hall('A&O').
 answer('Get free antigen test at nearby Test Center') :-
-    intention('I want to travel'), result(urgent), reside(city), res_hall('Independent Housing').
+    intention('I want to travel'), urgency(urgent), reside(city), res_hall('Independent Housing').
 answer('Order a test kit on Amazon') :-
-    intention('I want to travel'), \+result(urgent), testing('At home').
+    intention('I want to travel'), testing('At home').
 answer('Get a PCR test at Ostbahnhof Test Center') :-
-    intention('I want to travel'), \+result(urgent), testing('At testing center'), reside(city), res_hall('A&O').
+    intention('I want to travel'), \+urgency(urgent), testing('At testing center'), reside(city), res_hall('A&O').
 answer('Get a PCR test at a nearby test center') :-
-    intention('I want to travel'), \+result(urgent), testing('At testing center'), reside(city), res_hall('Independent Housing').
+    intention('I want to travel'), \+urgency(urgent), testing('At testing center'), reside(city), res_hall('Independent Housing').
 answer('Visit your local city website') :-
     intention('I want to travel'), \+reside(city).
 
@@ -78,9 +78,9 @@ reside(X) :-
     ask('Are you currently in the', X).
 
 exposure(X) :-
-    ask('Is your recent test result', X).
+    ask('Is your recent test urgency', X).
 
-result(X) :- ask('Is your need for testing', X).
+urgency(X) :- ask('Is your need for testing', X).
 
 insured(X) :- ask('Are you medically-insured by', X).
 

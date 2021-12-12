@@ -1,16 +1,15 @@
-from tkinter import Frame, Label, Button, Tk
+from tkinter import Frame, Label, Button, Tk, simpledialog
 from pyswip import Prolog, Functor, Variable, Atom, registerForeign, call
-from tkinter import simpledialog
-import pylcs
 import numpy as np
+import pylcs
 
 
-class DPDP:
+class ExpertSystem:
     def __init__(self, master):
         frame = Frame(master)
         frame.grid()
 
-        self.chatWindow = Label(
+        self.chatBox = Label(
             master,
             text="Welcome to Minerva CovidBot Berlin",
             bd=1,
@@ -18,23 +17,23 @@ class DPDP:
             fg="black",
             width=100,
             height=8,
-            justify="left",
+            justify="center",
         )
-        self.chatWindow.place(x=6, y=6, height=500, width=800)
+        self.chatBox.place(x=5, y=5, height=500, width=800)
 
         self.Button = Button(
             master,
-            text="Start system",
+            text="Begin system",
             bg="blue",
             activebackground="light blue",
             width=12,
             height=5,
             command=lambda: queryGenerator(),
         )
-        self.Button.place(x=6, y=510, height=88, width=800)
+        self.Button.place(x=5, y=510, height=88, width=800)
 
 
-prolog = Prolog()  # Global handle to interpreter
+prolog = Prolog()
 prolog.consult("kb.pl")
 retractall = Functor("retractall")
 known = Functor("known", 3)
@@ -42,33 +41,30 @@ known = Functor("known", 3)
 
 def system_response(response: str) -> None:
     """
-    Prints the input response to the GUI and returns True to Prolog
-    and prepending SYSTEM to show that it is the system talking
+    Displays system response to the GUI and returns True to Prolog
     """
-    app.chatWindow["text"] += f"SYSTEM: {response}"
+    app.chatBox["text"] += f"SYSTEM: {response}"
     return True
 
 
 def user_response(response: str) -> None:
     """
-    Prints the input response to the GUI and returns True to Prolog
-    and prepending USER to show that it is the user talking
+    Displays user response to the GUI and returns True to Prolog
     """
-    app.chatWindow["text"] += f"YOU: {response}\n"
+    app.chatBox["text"] += f"YOU: {response}\n"
     return True
 
 
-def read_py(A: Atom, V: Atom, Y: Variable) -> bool:
+def read_py(A, V, Y):
     """
-    Asks a question to the user and sends the response to Prolog.
-    It is used to get Yes, No questions.
-    Yes is normally evaluated by Prolog as True and any other input as False.
-    :param A: The question (askable) that the user should be prompted with.
-    :param V: The value that the user needs to agree (yes) or disagree
+    Askables (Yes/No questions) to user and sends the response to Prolog.
+    Yes is usually evaluated as True and any other input as False.
+    :param A: Askable prompted to user.
+    :param V: Value user needs to agree (yes) or disagree
                 (any other input) with.
-    :param Y: The value that Prolog will match with as True.
-                Normally it's 'Yes'.
-    :returns True if Y is a Prolog Variable and False otherwise.
+    :param Y: Value Prolog will match with as True.
+                Normally it is 'Yes'.
+    :returns True if Y is a Prolog Variable else False.
     """
     if isinstance(Y, Variable):
         system_response(f"{str(A)} {str(V)}?\n")
@@ -81,23 +77,23 @@ def read_py(A: Atom, V: Atom, Y: Variable) -> bool:
         return False
 
 
-def read_py_menu(A: Atom, Y: Variable, MenuList: list) -> bool:
+def read_py_menu(A, Y, Menu):
     """
     Asks the user for input based on a menu. Choosing the index of the option
     as well as the exact text of the option would work. When the response
     has the best LCS match with an option above 10% it is the default response.
-    :param A: The prompt (askable) the user needs to answer.
-    :param V: The answer that the user would let Prolog know about.
-    :param MenuList: The options that the user has to choose from.
-    :returns True if Y is a Prolog variable and False otherwise.
+    :param A: Askable the user must answer.
+    :param V: Answer from user to Prolog.
+    :param Menu: Provided options user can select.
+    :returns True if Y is a Prolog variable, else False.
     """
     if isinstance(Y, Variable):
         list_for_lcs = []
         question = "" + str(A) + "\n"
-        for i, x in enumerate(MenuList):
+        for i, x in enumerate(Menu):
             question += "\t" + str(i) + " .  " + str(x) + "\n"
             list_for_lcs.append(str(x))
-        response = get_menu_input(question, MenuList, list_for_lcs)
+        response = get_menu_input(question, Menu, list_for_lcs)
         user_response(response)
         Y.unify(response)
         return True
@@ -105,53 +101,44 @@ def read_py_menu(A: Atom, Y: Variable, MenuList: list) -> bool:
         return False
 
 
-def get_menu_input(question: str, MenuList: list, lst_lcs: list) -> str:
+def get_menu_input(question, Menu, lst_lcs):
     """
-    Carries out the logic of identifying the choice of the user from the menu.
-    A user can either choose a number or write some text.
-    If they choose a number it has to be a valid number amount the count of options given.
-    If they provide a string it has to have the best match (among the options) be more than 10%.
-    :param MenuList: The options that the user needs to choose from. They are stored as Prolog Atoms.
-    :param lst_lcs: The options stored in a list of strings that Python can interprate.
-    :returns a string of the option that the user chose.
+    This method contains the logic of identifying user's choice from the dialog box.
+    Users can either select numbers or write.
+    If user selects a number it has to be a valid number from the options given.
+    If user selects a string it has to be the best match among all options and > 10%.
+    :param Menu: The options that the user needs to choose from; stored as Atoms.
+    :param lst_lcs: Options in an array.
+    :returns user's option.
     """
     system_response(question)
     from_user = simpledialog.askstring("Input", question, parent=root)
     response_int = float("inf")
     try:
         response_int = int(from_user)
-        response = str(MenuList[response_int])
+        response = str(Menu[response_int])
     except:
         response = from_user.lower()
         response = most_appropriate(response, lst_lcs)
     return response
 
 
-def most_appropriate(response: str, lst_lcs: list) -> str:
+def most_appropriate(response, lst_lcs):
     """
-    Choose the most appropriate option given the response string.
-    It matches the choice by finding out the percentage LCS (Least Common Subsequence match).
-    If the best match is above 30%, it is taken as the choice of the user.
-    Otherwise the user will be reprompted for another option.
-    :parm response: The input from the user.
-    :param lst_lcs: The options stored in a list of strings that Python can interprate.
-    :returns a string of the option that the user chose.
+    Choose the most appropriate option given the user's response.
+    It matches the choice using percentage LCS (Least Common Subsequence) match.
+    If the best match > 10%, it is returned.
+    If not, user will be asked to re-select.
+    :parm response: User input.
+    :param lst_lcs: Options stored as a list of strings.
+    :returns User's option.
     """
     lcs = pylcs.lcs_of_list(response, lst_lcs)
-
     lengths = []
     for option in lst_lcs:
         lengths.append(len(option))
-
-    # Calculate the percentage match of the LCS
     similarities = np.array(lcs) / np.array(lengths)
-
-    # Identify the index of the highest match
     option_idx = np.argmax(similarities)
-
-    # If the highest match is less than 10% return original response
-    # so that the user can be reprompted
-    # otherwise return the best option
     if similarities[option_idx] < 0.1:
         return response
     return lst_lcs[option_idx]
@@ -171,24 +158,19 @@ registerForeign(read_py_menu)
 
 def queryGenerator():
     # this prints the values that are chosen,correctly
-
     # Each we query clear all the known values
     call(retractall(known))
-
-    app.chatWindow["text"] = "=" * 70 + "\n"
-
-    q = list(prolog.query("answer(X).", maxresult=1))  # prolog query
-
+    app.chatBox["text"] = "=" * 80 + "\n"
+    q = list(prolog.query("answer(X).", maxresult=1))
     for v in q:
-        app.chatWindow["text"] += f"ANSWER ==> {str(v['X'])}\n"
-
-    app.Button.configure(text="Run again")
+        app.chatBox["text"] += f"ANSWER ==> {str(v['X'])}\n"
+    app.Button.configure(text="Start again")
 
 
 root = Tk()
-root.geometry("820x600")
+root.geometry("810x600")
 root.resizable(0, 0)
-root.config(bg="#44689E")
-app = DPDP(root)
-root.title("DPDP")
+root.config(bg="red")
+app = ExpertSystem(root)
+root.title("Minerva Covid Chatbot")
 root.mainloop()
