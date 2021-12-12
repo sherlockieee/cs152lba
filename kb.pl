@@ -41,9 +41,9 @@ answer('You should continue isolation till next testing date'):-
 
 answer('Visit A&O Test Centre'):-
     intention('I came in close contact with a COVID patient'), \+exposure(known), \+symptoms(felt).
-answer('Visit your provider'):-
+answer('You need to contact your provider and Barbara Walder'):-
     intention('I came in close contact with a COVID patient'), \+exposure(known), symptoms(felt),  \+reside(city), \+insured('CIGNA').
-answer('Visit CIGNA'):-
+answer('You need to contact CIGNA and Barbara Walder'):-
     intention('I came in close contact with a COVID patient'), \+exposure(known), symptoms(felt), \+reside(city), insured('CIGNA').
 answer('Visit A&O Test Centre'):-
     intention('I came in close contact with a COVID patient'), \+exposure(known), symptoms(felt), reside(city), res_hall('A&O').
@@ -59,7 +59,7 @@ answer('Visit A&O Test Centre') :-
     intention('It\'s not urgent, I just want to make sure I\'m safe.'), testing('At testing center'), res_hall('A&O').
 answer('Visit a nearby Test Centre') :-
     intention('It\'s not urgent, I just want to make sure I\'m safe.'), testing('At testing center'), res_hall('Independent Housing').
-answer('Test privately') :-
+answer('Order a test kit on Amazon') :-
     intention('It\'s not urgent, I just want to make sure I\'m safe.'), testing('At home').
 
 
