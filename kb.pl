@@ -78,7 +78,7 @@ reside(X) :-
     ask('Are you currently in the', X).
 
 exposure(X) :-
-    ask('Is your recent test urgency', X).
+    ask('Is your recent test result', X).
 
 urgency(X) :- ask('Is your need for testing', X).
 
