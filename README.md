@@ -10,7 +10,7 @@ brew install swi-prolog
 brew install python-tk@3.9
 ```
 
-Start the project:
+Start the project on MacOS:
 ```
 python3 -m venv venv
 source venv/bin/activate

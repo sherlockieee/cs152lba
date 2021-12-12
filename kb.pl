@@ -6,86 +6,84 @@
 
 %KB rules when you have symptoms
 
-answer('You need to contact CIGNA and Barbara Walder') :- intention('I am experiencing COVID symptom(s), I want to know next steps'), \+reside(res), insured('CIGNA').
-answer('You need to contact your provider and Barbara Walder') :- intention('I am experiencing COVID symptom(s), I want to know next steps'), \+reside(res), \+insured('CIGNA').
+answer('You need to contact CIGNA and Barbara Walder') :- intention('I am experiencing COVID symptom(s), I want to know next steps'), \+reside(city), insured('CIGNA').
+answer('You need to contact your provider and Barbara Walder') :- intention('I am experiencing COVID symptom(s), I want to know next steps'), \+reside(city), \+insured('CIGNA').
 
 
-answer('Visit A&O Test Centre') :- intention('I am experiencing COVID symptom(s), I want to know next steps'), reside(res), res_hall(A&O).
-answer('Visit a nearby Test Centre') :- intention('I am experiencing COVID symptom(s), I want to know next steps'), reside(res), res_hall('Independent Housing').
+answer('Visit A&O Test Centre') :- intention('I am experiencing COVID symptom(s), I want to know next steps'), reside(city), res_hall('A&O').
+answer('Visit a nearby Test Centre') :- intention('I am experiencing COVID symptom(s), I want to know next steps'), reside(city), res_hall('Independent Housing').
 
 
 
 %rules when you are to travel
 
 answer('Visit A&O Test Centre') :-
-    intention('I want to travel'), result(urgent), res_hall(A&O).
+    intention('I want to travel'), result(urgent), res_hall('A&O').
 answer('Visit a nearby Test Center') :-
     intention('I want to travel'), result(urgent), res_hall('Independent Housing').
 answer('Test privately') :-
-    intention('I want to travel'), \+result(urgent), testing(at_home).
+    intention('I want to travel'), \+result(urgent), testing('At home').
 answer('Visit A&O Test Centre') :-
-    intention('I want to travel'), \+result(urgent), testing(at_testing_center), reside(res), res_hall(A&O).
+    intention('I want to travel'), \+result(urgent), testing('At testing center'), reside(city), res_hall('A&O').
 answer('Visit a nearby Test Centre') :-
-    intention('I want to travel'), \+result(urgent), testing(at_testing_center), reside(res), res_hall('Independent Housing').
+    intention('I want to travel'), \+result(urgent), testing('At testing center'), reside(city), res_hall('Independent Housing').
+answer('Visit your local city website') :-
+    intention('I want to travel'), \+reside(city).
 
 
 
 %rules when you interract with infected person
 
 answer('You should isolate immediately'):-
-    intention('I had a close contact with a COVID patient. What should I do?'), exposure(known), \+quarantine_status(qurantine).
+    intention('I came in close contact with a COVID patient'), exposure(known), \+quarantine_status(quarantine).
 answer('You should continue isolation till next testing date'):-
-    intention('I had a close contact with a COVID patient. What should I do?'), exposure(known), quarantine_status(quarantine).
+    intention('I came in close contact with a COVID patient'), exposure(known), quarantine_status(quarantine).
 
 answer('Visit A&O Test Centre'):-
-    intention('I had a close contact with a COVID patient. What should I do?'), \+exposure(known), \+symptoms(felt).
+    intention('I came in close contact with a COVID patient'), \+exposure(known), \+symptoms(felt).
 answer('Visit your provider'):-
-    intention('I had a close contact with a COVID patient. What should I do?'), \+exposure(known), symptoms(felt),  \+reside(res), \+insured('CIGNA').
+    intention('I came in close contact with a COVID patient'), \+exposure(known), symptoms(felt),  \+reside(city), \+insured('CIGNA').
 answer('Visit CIGNA'):-
-    intention('I had a close contact with a COVID patient. What should I do?'), \+exposure(known), symptoms(felt), \+reside(res), insured('CIGNA').
+    intention('I came in close contact with a COVID patient'), \+exposure(known), symptoms(felt), \+reside(city), insured('CIGNA').
 answer('Visit A&O Test Centre'):-
-    intention('I had a close contact with a COVID patient. What should I do?'), \+exposure(known), symptoms(felt), reside(res), res_hall(A&O).
+    intention('I came in close contact with a COVID patient'), \+exposure(known), symptoms(felt), reside(city), res_hall('A&O').
 answer('Visit a nearby Test Centre'):-
-    intention('I had a close contact with a COVID patient. What should I do?'), \+exposure(known), symptoms(felt), reside(res), res_hall('Independent Housing').
+    intention('I came in close contact with a COVID patient'), \+exposure(known), symptoms(felt), reside(city), res_hall('Independent Housing').
 
 
-% rules when for a non-urgent check
+% rules for a non-urgent check
 
 answer('Visit A&O Test Centre') :-
-    intention('I am curious about some casual stuff'), testing(at_testing_center), res_hall(A&O).
+    intention('It\'s not urgent, I just want to make sure I\'m safe.'), testing('At testing center'), res_hall('A&O').
 answer('Visit A&O Test Centre') :-
-    intention('I am curious about some casual stuff'), testing(at_testing_center), res_hall(A&O).
+    intention('It\'s not urgent, I just want to make sure I\'m safe.'), testing('At testing center'), res_hall('A&O').
 answer('Visit a nearby Test Centre') :-
-    intention('I am curious about some casual stuff'), testing(at_testing_center), res_hall('Independent Housing').
-answer('Visit a nearby Test Centre') :-
-    intention('I am curious about some casual stuff'), testing(at_testing_center), res_hall('Independent Housing').
+    intention('It\'s not urgent, I just want to make sure I\'m safe.'), testing('At testing center'), res_hall('Independent Housing').
 answer('Test privately') :-
-    intention('I am curious about some casual stuff'), testing(at_home).
+    intention('It\'s not urgent, I just want to make sure I\'m safe.'), testing('At home').
 
 
 
 %FACTS
-reside(X) :-
-    ask('Do you live in the', X).
 
 res_hall(X) :-
-    menuask('Which res hall are you currently in?', X, [A&O, 'Independent Housing']).
+    menuask('Which res hall are you currently in?', X, ['A&O', 'Independent Housing']).
 
 testing(X) :-
-    menuask('Where do you want to test?', X, [at_home, at_testing_center]).
+    menuask('Where do you want to test?', X, ['At home', 'At testing center']).
 
-
+reside(X) :-
+    ask('Are you currently in the', X).
 
 exposure(X) :-
-    ask('What is your source of exposure', X).
+    ask('Is your source of exposure', X).
 
 result(X) :- ask('Is your need for testing', X).
 
 insured(X) :- ask('Are you medically-insured by', X).
 
-
 intention(X) :-
-    menuask('What is your intention for taking the COVID test?', X, ['I am experiencing COVID symptom(s), I want to know next steps', 'I want to travel', 'I had a close contact with a COVID patient. What should I do?', 'I am curious about some casual stuff']).
+    menuask('Why do you want to take the COVID test?', X, ['I am experiencing COVID symptom(s), I want to know next steps', 'I want to travel', 'I came in close contact with a COVID patient', 'It\'s not urgent, I just want to make sure I\'m safe.']).
 
 
 quarantine_status(X) :-
@@ -141,6 +139,6 @@ check_val(X, _, _, MenuList) :-
  member(X, MenuList),
  !.
 check_val(X, A, V, MenuList) :-
- system_response(X), system_response(' is not a legal value, try again.\n'),
+ system_response('That is not a legal value, try again.\n'),
  menuask(A, V, MenuList).
 
