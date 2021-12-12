@@ -18,9 +18,9 @@ answer('Get a PCR test at a nearby test center') :- intention('I am experiencing
 %rules when you are to travel
 
 answer('Get free antigen test at A&O Test Centre') :-
-    intention('I want to travel'), urgency(urgent), reside(city), res_hall('A&O').
+    intention('I want to travel'), urgency(urgent), reside(city), res_hall('A&O'), testing('At testing center').
 answer('Get free antigen test at nearby Test Center') :-
-    intention('I want to travel'), urgency(urgent), reside(city), res_hall('Independent Housing').
+    intention('I want to travel'), urgency(urgent), reside(city), res_hall('Independent Housing'), testing('At testing center').
 answer('Order a test kit on Amazon') :-
     intention('I want to travel'), testing('At home').
 answer('Get a PCR test at Ostbahnhof Test Center') :-
