@@ -1,0 +1,4 @@
+numpy==1.21.4
+pybind11==2.8.1
+pylcs==0.0.6
+pyswip==0.2.10
