@@ -18,3 +18,4 @@ pip install -r requirements.txt
 python3 CS152LBA.py
 ```
 
+Code created by [Philip Boakye](https://github.com/fhylinjr), (with modifications). 
